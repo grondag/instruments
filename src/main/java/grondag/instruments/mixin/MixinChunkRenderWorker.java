@@ -20,13 +20,11 @@ import net.minecraft.world.chunk.Chunk;
 @Mixin(ChunkRenderWorker.class)
 public class MixinChunkRenderWorker {
     
-    private static volatile ChunkRebuildCounters counters = new ChunkRebuildCounters();
-    
     @Redirect(method = "runTask", require = 1,
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/chunk/ChunkRenderer;rebuildChunk(FFFLnet/minecraft/client/render/chunk/ChunkRenderTask;)V"))
     private void timeChunkRebuild(ChunkRenderer chunk, float x, float y, float z, ChunkRenderTask task) {
         
-        final ChunkRebuildCounters counts = counters;
+        final ChunkRebuildCounters counts = ChunkRebuildCounters.get();
         
         final World world = chunk.getWorld();
         final BlockPos origin = chunk.getOrigin();
@@ -66,7 +64,7 @@ public class MixinChunkRenderWorker {
         fluidCount = counts.fluidCounter.addAndGet(fluidCount);
         
         if(chunkCount == 2000) {
-            counters = new ChunkRebuildCounters();
+            ChunkRebuildCounters.reset();
             
             int total = blockCount + fluidCount;
             Instruments.LOG.info(String.format("ChunkRenderer.chunkRebuild elapsed time per chunk for last 2000 chunks = %,dns", nanos / 2000));
