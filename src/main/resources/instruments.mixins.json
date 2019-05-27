@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "package": "grondag.instruments.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+  ],
+  "client": [
+  	"MixinChunkRenderWorker"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
