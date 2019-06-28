@@ -5,8 +5,7 @@
   "mixins": [
   ],
   "client": [
-  	"MixinChunkRenderWorker",
-  	"MixinWorldRenderer"
+  	"MixinChunkRenderWorker"
   ],
   "injectors": {
     "defaultRequire": 1

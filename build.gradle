@@ -1,15 +1,10 @@
-import net.fabricmc.loom.task.RemapJar
-
 plugins {
-	id 'fabric-loom' version '0.2.2-SNAPSHOT'
-	id 'java'
-	id 'maven'
+	id 'fabric-loom' version '0.2.4-SNAPSHOT'
 	id 'maven-publish'
-	id 'com.github.johnrengelman.shadow' version '4.0.3'
 }
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
 
 ext.getVersionCode = { ->
     try {
@@ -27,7 +22,7 @@ ext.getVersionCode = { ->
 
 archivesBaseName = "instruments"
 group = "grondag"
-version = version = "0.0.1+build." + project.getVersionCode();
+version = version = "0.0.2+build." + project.getVersionCode();
 
 minecraft {
 }
@@ -56,32 +51,16 @@ repositories {
 
 processResources {
 	inputs.property "version", version
+	
 	from(sourceSets.main.resources.srcDirs) {
 		include "fabric.mod.json"
 		expand "version": version
 	}
+	
+	from(sourceSets.main.resources.srcDirs) {
+		exclude "fabric.mod.json"
+	}
 }
-
-configurations {
-    included {
-        transitive = false
-    }
-}
-
-shadowJar {
-    version = version
-    classifier = null
-    relocate 'blue.endless.jankson', 'grondag.instruments.shadow.jankson'
-    configurations = [project.configurations.included]
-}
-
-task remapShadowJar(type: RemapJar) {
-    jar = shadowJar.archivePath
-}
-
-tasks.remapShadowJar.dependsOn tasks.shadowJar
-
-tasks.assemble.dependsOn tasks.remapShadowJar
 
 // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
 // if it is present.
@@ -99,7 +78,6 @@ tasks.withType(JavaCompile) {
 }
 
 jar {
-	classifier = "slim"
 	from "LICENSE"
 }
 
@@ -122,47 +100,37 @@ sourceSets {
     }
 }
 
-def mcVersion = "1.14.2 Pre-Release 2"
+def mcVersion = "1.14.3"
 
 dependencies {
 	minecraft "com.mojang:minecraft:$mcVersion"
-	mappings "net.fabricmc:yarn:$mcVersion+build.6"
-	modCompile "net.fabricmc:fabric-loader:0.4.7+build.153"
-	//modCompile "net.fabricmc.fabric-api:fabric-api:0.3.0-pre+build.166"
-	modCompile "net.fabricmc.fabric-api:fabric-api:0.3.0-pre+local"
+	mappings "net.fabricmc:yarn:$mcVersion+build.1"
+    modImplementation "net.fabricmc:fabric-loader:0.4.8+build.155"
+    modCompile "net.fabricmc.fabric-api:fabric-api:0.3.0+build.187"
 	
-	//modCompile "grondag:fermion:0.4.+"
-	//include "grondag:fermion:0.4.+"
+    modImplementation "grondag:fermion:0.6.3+build.37"
+    include "grondag:fermion:0.6.3+build.37"
 	
-    //modCompile "cloth-config:ClothConfig:0.2.1.14"
-    //include "cloth-config:ClothConfig:0.2.1.14"
-	
-	//compile "blue.endless:jankson:1.1.0"
-	//included "blue.endless:jankson:1.1.0"
+	modApi "cloth-config:ClothConfig2:0.2.0"
+    include "cloth-config:ClothConfig2:0.2.0"
 	
 	// For dev env testing 
-	modCompile "com.jamieswhiteshirt:developer-mode:1.0.11"
-	//modCompile "io.github.prospector.modmenu:ModMenu:1.5.4-85"
-	//modCompile "cloth:ClothEvents:0.3.1.23" // for REI
-	//modCompile "roughly-enough-items:RoughlyEnoughItems:2.7.11.97"
+	modRuntime "com.jamieswhiteshirt:developer-mode:1.0.11"
+	modApi "io.github.prospector.modmenu:ModMenu:1.6.2-92"
 	
 	// dev env annotation support
 	// compile "org.apiguardian:apiguardian-api:1.0.0"
 	compile "com.google.code.findbugs:jsr305:3.0.2"
-	
 }
 
 publishing {
     publications {
         mavenJava(MavenPublication) {
-			artifact(jar) {
-				builtBy remapJar
+			artifact(jar.archivePath) {
+	    		builtBy remapJar
 			}
 			artifact(sourcesJar) {
 				builtBy remapSourcesJar
-			}
-			artifact(shadowJar) {
-				builtBy remapShadowJar
 			}
         }
     }
