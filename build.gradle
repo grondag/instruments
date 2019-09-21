@@ -28,10 +28,6 @@ minecraft {
 
 repositories {
 	mavenLocal()
-    //flatDir {
-    //    dirs '../fabric/build/libs'
-    //}
-    
     maven { url "https://tehnut.info/maven"}
     maven { url "http://maven.sargunv.s3-website-us-west-2.amazonaws.com/" }
     maven { url "https://minecraft.curseforge.com/api/maven" }
@@ -99,25 +95,11 @@ sourceSets {
     }
 }
 
-def mcVersion = "1.14.3"
-
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}"
 	modCompile "net.fabricmc:fabric-loader:${project.loader_version}"
-	modCompile "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-	
-	modImplementation "grondag:fermion:${project.fermion_version}+"
-    include "grondag:fermion:${project.fermion_version}+"
-    
-    modImplementation "grondag:fermion-varia:${project.fermion_varia_version}+"
-    include "grondag:fermion-varia:${project.fermion_varia_version}+"
-    
-	modRuntime ("me.shedaniel.cloth:config-2:${clothconfig_version}") {
-        exclude group :"io.github.prospector.modmenu"
-        exclude group :"net.fabricmc.fabric-api"
-    }
-	include "me.shedaniel.cloth:config-2:${clothconfig_version}"
+	//modCompile "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	
 	// For dev env testing 
 	modRuntime "com.jamieswhiteshirt:developer-mode:${project.devmode_version}"
@@ -140,12 +122,11 @@ publishing {
 		}
 	}
 
-	repositories {
-		mavenLocal()
-		maven {
+    repositories {
+        maven {
             url "https://grondag-repo.appspot.com"
             credentials {
-				if (project.hasProperty('maven_user')){
+            	if (project.hasProperty('maven_user')){
 					username = project.getProperty('maven_user')
 				}
 				if (project.hasProperty('maven_password')){
@@ -153,5 +134,5 @@ publishing {
 				}
 			}
         }
-	}
+    }
 }
